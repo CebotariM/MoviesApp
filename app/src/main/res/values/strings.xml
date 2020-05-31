@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">MoviesApp</string>
+
+    <!--error messages-->
+    <string name="error_wrong_response_code">Response code %1s</string>
+    <string name="error_no_internet">No Internet connection, please connect to a network and try again.</string>
+    <string name="error_wrong_call">An error occurred while processing request. Please try again later</string>
+    <string name="error_general">Something went wrong</string>
+
+    <!-- Tab Titles -->
+    <string name="tab_title_top_rated">Top Rated</string>
+    <string name="tab_title_popular">Popular</string>
+
+</resources>

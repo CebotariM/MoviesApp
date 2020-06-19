@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import com.endava.encarsharing.android.ui.base.BaseFragment
+import com.mcebotari.moviesapp.R
 import com.mcebotari.moviesapp.data.model.MovieListResponse
 import com.mcebotari.moviesapp.databinding.FragmentListBinding
 import com.mcebotari.moviesapp.view.list.adapter.ListAdapter
@@ -39,7 +40,10 @@ abstract class ListFragment : BaseFragment(), PaginatedAdapter.OnPaginationListe
         super.onViewCreated(view, savedInstanceState)
         setupAdapter()
         viewModel.getMoviesListLiveData().observe(viewLifecycleOwner, Observer { updateList(it) })
-        viewModel.getOpenDetailsActionLiveData().observe(viewLifecycleOwner, Observer { openDetailsFor(it) })
+        viewModel.getOpenDetailsActionLiveData()
+            .observe(viewLifecycleOwner, Observer { openDetailsFor(it) })
+        viewModel.getSwipeToRefreshAction()
+            .observe(viewLifecycleOwner, Observer { fetchNextPage() })
         fetchNextPage()
     }
 
@@ -52,6 +56,10 @@ abstract class ListFragment : BaseFragment(), PaginatedAdapter.OnPaginationListe
         adapter.recyclerView = list_recycler
         adapter.setPageSize(API_PAGE_SIZE)
         adapter.setOnPaginationListener(this)
+        list_recycler.layoutAnimation = android.view.animation.AnimationUtils.loadLayoutAnimation(
+            requireContext(),
+            R.anim.layout_animation_fall_down
+        )
     }
 
     override fun onFinish() {
@@ -63,13 +71,17 @@ abstract class ListFragment : BaseFragment(), PaginatedAdapter.OnPaginationListe
     }
 
     override fun onNextPage(page: Int) {
-        list_progress_bar.visibility = View.VISIBLE
-        viewModel.fetchPopularMoviesNextPage()
+        fetchNextPage()
     }
 
-    private fun updateList(it: MovieListResponse) {
-        list_progress_bar.visibility = View.GONE
-        adapter.submitItems(it.results)
+    private fun updateList(moviesResponse: MovieListResponse?) {
+        moviesResponse?.let {
+            if (it.page == 1) { // animate only on start, subsequent animation will animate everything
+                list_recycler.scheduleLayoutAnimation()
+            }
+            swipe_refresh_layout.isRefreshing = false
+            adapter.submitItems(it.results)
+        } ?: adapter.clear()
     }
 }
 

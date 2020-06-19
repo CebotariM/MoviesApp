@@ -15,20 +15,27 @@ class ListViewModel @Inject constructor(private val moviesRepository: MoviesRepo
 
     private val moviesListMutableLiveData = MutableLiveData<MovieListResponse>()
     private val openDetailsAction = SingleLiveEvent<Int>()
+    private val swipeToRefreshAction = SingleLiveEvent<Void>()
 
-    fun getMoviesListLiveData(): LiveData<MovieListResponse> = moviesListMutableLiveData
+    fun getMoviesListLiveData(): LiveData<MovieListResponse?> = moviesListMutableLiveData
     fun getOpenDetailsActionLiveData() = openDetailsAction
+    fun getSwipeToRefreshAction() = swipeToRefreshAction
 
     fun fetchPopularMoviesNextPage() {
         wrapFetching { moviesRepository.getPopularMoviesList(it) }
     }
 
     fun fetchTopRatedMoviesNextPage() {
-        wrapFetching{ moviesRepository.getTopRatedMoviesList(it) }
+        wrapFetching { moviesRepository.getTopRatedMoviesList(it) }
     }
 
     fun openDetailsFor(movieId : Int){
         openDetailsAction.value = movieId
+    }
+
+    fun onSwipeToRefresh(){
+        moviesListMutableLiveData.value = null
+        swipeToRefreshAction.call()
     }
 
     private fun wrapFetching(action : suspend (pageToFetch : Int) -> MovieListResponse){

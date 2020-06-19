@@ -7,7 +7,7 @@ import com.mcebotari.moviesapp.databinding.ViewholderListMainBinding
 import com.mcebotari.moviesapp.view.list.ListViewModel
 import com.softrunapps.paginatedrecyclerview.PaginatedAdapter
 
-class ListAdapter(val listViewModel: ListViewModel) : PaginatedAdapter<MovieDetail, ListItem>() {
+class ListAdapter(private val listViewModel: ListViewModel) : PaginatedAdapter<MovieDetail, ListItem>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         ListItem(
